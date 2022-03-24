@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    const auto i = 2;
+    const auto i = 1;
     const QString str = "Value";
 
     // Example for Temp Config File
