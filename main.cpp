@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     const auto i = 1;
-    const QString str = "Value";
+    QString str = "Value";
 
     // Example for Temp Config File
     if(TempConfig::status() != QSettings::NoError)
@@ -53,8 +53,8 @@ int main(int argc, char *argv[])
         qDebug() << "Config file isn't valid.";
         return 1;
     }
-    TempConfig::writeValue(TempConfigEnum::Param1, i);
-    TempConfig::writeValue(TempConfigEnum::Param2, str);
+    TempConfig::writeValue(TempConfigEnum::Param1, i); // int const&
+    TempConfig::writeValue(TempConfigEnum::Param2, str); // QString &
 
     qInfo() << TempConfig::readValue<int>(TempConfigEnum::Param1);      // 1
     qInfo() << TempConfig::readValue<QString>(TempConfigEnum::Param2);  // "Value"
@@ -65,8 +65,8 @@ int main(int argc, char *argv[])
         qDebug() << "Config file isn't valid.";
         return 1;
     }
-    MainConfig::writeValue(MainConfigEnum::ConfigParam1, i);
-    MainConfig::writeValue(MainConfigEnum::ConfigParam2, str);
+    MainConfig::writeValue(MainConfigEnum::ConfigParam1, 1); // int&&
+    MainConfig::writeValue(MainConfigEnum::ConfigParam2, std::move(str)); // QString &&
 
     qInfo() << MainConfig::readValue<int>(MainConfigEnum::ConfigParam1);    // 1
     qInfo() << MainConfig::readValue<QString>(MainConfigEnum::ConfigParam2);// "Value"

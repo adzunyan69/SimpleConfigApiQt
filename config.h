@@ -15,7 +15,7 @@ public:
     Config() = delete;
 
     template<typename T>
-    static T readValue(const EnumType &key, const T &defaultValue = T { })
+    static T readValue(const EnumType& key, T&& defaultValue = T { })
     {
 #ifdef CONFIG_DEBUG_PRINT
         qDebug() << QString("readValue(%1, %2) to file { %3 } with format { %4 }, status { %5 }")
@@ -25,11 +25,11 @@ public:
                     .arg(settings.format())
                     .arg(settings.status());
 #endif
-        return qvariant_cast<T>(settings.value(keyToString[key], defaultValue));
+        return qvariant_cast<T>(settings.value(keyToString[key], std::forward<T>(defaultValue)));
     }
 
     template<typename T>
-    static void writeValue(const EnumType &key, const T &value)
+    static void writeValue(const EnumType& key,T&& value)
     {
 #ifdef CONFIG_DEBUG_PRINT
         qDebug() << QString("writeValue(%1, %2) to file { %3 } with format { %4 }, status { %5 }")
@@ -39,7 +39,7 @@ public:
                     .arg(settings.format())
                     .arg(settings.status());
 #endif
-        settings.setValue(keyToString[key], QVariant::fromValue(value));
+        settings.setValue(keyToString[key], QVariant::fromValue(std::forward<T>(value)));
         settings.sync();
     }
 
