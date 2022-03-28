@@ -4,11 +4,11 @@
 #include <QMap>
 #include <QSettings>
 
-#define CONFIG_DEBUG_PRINT
-
 #ifdef CONFIG_DEBUG_PRINT
 #include <QDebug>
 #endif
+
+namespace adzunyan69 {
 
 template<typename EnumType>
 class Config
@@ -50,6 +50,12 @@ public:
         return settings.status();
     }
 
+    // Clear all keys & values from config file
+    static void clear()
+    {
+        settings.clear();
+    }
+
     // Create config with custom values
     static void initConfig(const QMap<EnumType, QVariant>& keyToValues)
     {
@@ -74,5 +80,6 @@ private:
 
 };
 
+}; // namespace adzunyan69
 
 #endif // CONFIG_H
