@@ -4,6 +4,8 @@
 #include <QMap>
 #include <QSettings>
 
+#define CONFIG_DEBUG_PRINT
+
 #ifdef CONFIG_DEBUG_PRINT
 #include <QDebug>
 #endif
@@ -15,10 +17,10 @@ public:
     Config() = delete;
 
     template<typename T>
-    static T readValue(const EnumType& key, T&& defaultValue = T { })
+    static T value(const EnumType& key, T&& defaultValue = T { })
     {
 #ifdef CONFIG_DEBUG_PRINT
-        qDebug() << QString("readValue(%1, %2) to file { %3 } with format { %4 }, status { %5 }")
+        qDebug().noquote().nospace() << QString("\n\treadValue(%1, %2)\n\tto file { %3 }\n\twith format { %4 }, status { %5 }")
                     .arg(static_cast<int>(key))
                     .arg(defaultValue)
                     .arg(settings.fileName())
@@ -29,23 +31,41 @@ public:
     }
 
     template<typename T>
-    static void writeValue(const EnumType& key,T&& value)
+    static void setValue(const EnumType& key,T&& value)
     {
 #ifdef CONFIG_DEBUG_PRINT
-        qDebug() << QString("writeValue(%1, %2) to file { %3 } with format { %4 }, status { %5 }")
+        qDebug().noquote().nospace() << QString("\n\twriteValue(%1, %2)\n\tto file { %3 }\n\twith format { %4 }, status { %5 }")
                     .arg(static_cast<int>(key))
                     .arg(value)
                     .arg(settings.fileName())
                     .arg(settings.format())
                     .arg(settings.status());
 #endif
-        settings.setValue(keyToString[key], QVariant::fromValue(std::forward<T>(value)));
+        settings.setValue(keyToString[key], std::forward<T>(value));
         settings.sync();
     }
 
     static QSettings::Status status()
     {
         return settings.status();
+    }
+
+    // Create config with custom values
+    static void initConfig(const QMap<EnumType, QVariant>& keyToValues)
+    {
+        for(auto It = keyToValues.cbegin(); It != keyToValues.cend(); ++It)
+        {
+            settings.setValue(keyToString[It.key()], It.value());
+        }
+    }
+
+    // Create config with empty values
+    static void initEmptyValuesConfig()
+    {
+        for(auto It = keyToString.cbegin(); It != keyToString.cend(); ++It)
+        {
+            settings.setValue(It.value(), "");
+        }
     }
 
 private:

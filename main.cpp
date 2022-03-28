@@ -44,8 +44,21 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    const auto i = 1;
-    QString str = "Value";
+    qSetMessagePattern("[%{time hh:mm:ss.zzz}] [%{file} %{function} line %{line}] [%{type}]: %{message}");
+
+    TempConfig::initConfig(
+    {
+                    {TempConfigEnum::Param1, 5},
+                    {TempConfigEnum::Param2, "Value5"}
+                });
+
+    qInfo() << TempConfig::value<int>(TempConfigEnum::Param1);      // 5
+    qInfo() << TempConfig::value<QString>(TempConfigEnum::Param2);  // "Value5"
+
+    MainConfig::initEmptyValuesConfig(); // empty config
+
+    const auto i { 1 };
+    QString str { "Value" };
 
     // Example for Temp Config File
     if(TempConfig::status() != QSettings::NoError)
@@ -53,11 +66,11 @@ int main(int argc, char *argv[])
         qDebug() << "Config file isn't valid.";
         return 1;
     }
-    TempConfig::writeValue(TempConfigEnum::Param1, i); // int const&
-    TempConfig::writeValue(TempConfigEnum::Param2, str); // QString &
+    TempConfig::setValue(TempConfigEnum::Param1, i); // int const&
+    TempConfig::setValue(TempConfigEnum::Param2, str); // QString &
 
-    qInfo() << TempConfig::readValue<int>(TempConfigEnum::Param1);      // 1
-    qInfo() << TempConfig::readValue<QString>(TempConfigEnum::Param2);  // "Value"
+    qInfo() << TempConfig::value<int>(TempConfigEnum::Param1);      // 1
+    qInfo() << TempConfig::value<QString>(TempConfigEnum::Param2);  // "Value"
 
     // Example for Main Config File
     if(MainConfig::status() != QSettings::NoError)
@@ -65,11 +78,11 @@ int main(int argc, char *argv[])
         qDebug() << "Config file isn't valid.";
         return 1;
     }
-    MainConfig::writeValue(MainConfigEnum::ConfigParam1, 1); // int&&
-    MainConfig::writeValue(MainConfigEnum::ConfigParam2, std::move(str)); // QString &&
+    MainConfig::setValue(MainConfigEnum::ConfigParam1, 2); // int&&
+    MainConfig::setValue(MainConfigEnum::ConfigParam2, std::move(str)); // QString &&
 
-    qInfo() << MainConfig::readValue<int>(MainConfigEnum::ConfigParam1);    // 1
-    qInfo() << MainConfig::readValue<QString>(MainConfigEnum::ConfigParam2);// "Value"
+    qInfo() << MainConfig::value<int>(MainConfigEnum::ConfigParam1);    // 2
+    qInfo() << MainConfig::value<QString>(MainConfigEnum::ConfigParam2);// "Value"
 
     return a.exec();
 }
